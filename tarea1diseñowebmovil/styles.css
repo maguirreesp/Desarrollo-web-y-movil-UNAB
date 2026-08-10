@@ -53,14 +53,14 @@ nav li {
   }
   
   nav a {
-    color: white;
+    color: rgb(0, 0, 0);
     text-decoration: none; /* Quita el subrayado */
   }
   
   nav ul {
-    display: flex; /* Pone los links lado a lado */
-    list-style: none; /* Quita los bullets */
-    gap: 20px; /* Espacio entre links */
+    display: flex;
+    list-style: none;
+    gap: 20px; 
   }
 
   .col-4 {
