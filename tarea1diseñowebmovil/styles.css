@@ -1,0 +1,83 @@
+.hero {
+  background-color: #ADD8E6; /* celeste */
+  padding: 60px 20px;
+}
+
+.hero h1 {
+  font-size: 48px;
+  color: #1a3a52;
+  text-align: center;
+}
+
+nav li {
+  padding: 10px 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto; /* Centra el contenedor */
+    padding: 20px;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr); /* Hace las 12 columnas iguales */
+    gap: 20px; /* Espacio entre columnas */
+  }
+  
+  .col-4 {
+    grid-column: span 4; /* Ocupa 4 de esas 12 */
+    
+  }
+  
+  .col-12 {
+    grid-column: span 12; /*Ocupa las 12 columnas*/
+    
+  }
+
+  @media (max-width: 768px) {
+    .col-4 {
+      grid-column: span 6; /* En pantallas pequeñas, cada columna ocupa todo el ancho */
+    }
+  }
+
+  @media (max-width: 480px) {
+    .col-4 {
+      grid-column: span 12; /* En pantallas muy pequeñas, cada columna ocupa todo el ancho */
+    }
+  }
+
+  header {
+    background-color: #1a3a52
+    padding: 20px 0;
+  }
+  
+  nav a {
+    color: white;
+    text-decoration: none; /* Quita el subrayado */
+  }
+  
+  nav ul {
+    display: flex; /* Pone los links lado a lado */
+    list-style: none; /* Quita los bullets */
+    gap: 20px; /* Espacio entre links */
+  }
+
+  .col-4 {
+    background-color: #B19CD9; /* Color de fondo lila */
+    border: 1px solid #000000;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .col-4 h3 {
+    color: #1a3a52; /* azul oscuro */
+  }
+
+  footer {
+    background-color: #1a3a52;
+    color: white;
+    padding: 20px;
+    text-align: center;
+  }
