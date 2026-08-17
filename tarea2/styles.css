@@ -1,0 +1,37 @@
+:root {
+  --color-azul-oscuro: #710d28;
+  --color-celeste: #ADD8E6;
+  --color-lila: #B19CD9;
+}
+
+/* Navbar personalizada */
+.navbar {
+  background-color: var(--color-azul-oscuro) !important;
+}
+
+/* Hero/Container principal */
+.container {
+  padding-top: 20px;
+}
+
+/* Footer */
+footer {
+  background-color: var(--color-azul-oscuro);
+  color: rgb(0, 0, 0);
+  padding: 20px 0;
+  margin-top: 40px;
+}
+
+/* Modal personalizado */
+.modal-header {
+  background-color: var(--color-celeste);
+}
+
+.btn-outline-primary {
+  color: var(--color-azul-oscuro);
+  border-color: var(--color-azul-oscuro);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--color-azul-oscuro);
+}
