@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script>
+        function agregarProducto(){
+            let cmb = document.getElementById("cmbProducto");
+            let id = document.getElementById("txtId").value;
+            let nombre = document.getElementById("txtNombre").value;
+            let opt = document.createElement("option");
+            opt.setAttribute("value", id);
+            opt.innerText = nombre;
+            cmb.appendChild(opt);
+        }
+    </script>
+</head>
+<body>
+    <input id="txtId" type="text" placeholder="ID"/><br>
+    <input id="txtNombre" type="text" placeholder="Nombre"/><br>
+    <button onclick="agregarProducto();">Agregar</button><br>
+    <select id="cmbProducto"></select>
+</body>
+</html>

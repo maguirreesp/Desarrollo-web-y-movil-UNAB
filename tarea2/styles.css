@@ -1,12 +1,12 @@
 :root {
-  --color-azul-oscuro: #710d28;
+  --color-burdeo: #710d28;
   --color-celeste: #ADD8E6;
   --color-lila: #B19CD9;
 }
 
 /* Navbar personalizada */
 .navbar {
-  background-color: var(--color-azul-oscuro) !important;
+  background-color: var(--color-burdeo) !important;
 }
 
 /* Hero/Container principal */
@@ -16,7 +16,7 @@
 
 /* Footer */
 footer {
-  background-color: var(--color-azul-oscuro);
+  background-color: var(--color-burdeo);
   color: rgb(0, 0, 0);
   padding: 20px 0;
   margin-top: 40px;
@@ -28,10 +28,27 @@ footer {
 }
 
 .btn-outline-primary {
-  color: var(--color-azul-oscuro);
-  border-color: var(--color-azul-oscuro);
+  color: white;
+  border-color: white;
 }
 
 .btn-outline-primary:hover {
-  background-color: var(--color-azul-oscuro);
+  background-color: white;
+  color: var(--color-burdeo);
+}
+
+/* Card Burdeo */
+.card-burdeo .card-header {
+  background-color: var(--color-burdeo) !important;
+  color: white;
+}
+
+.card-celeste .card-header {
+  background-color: var(--color-celeste) !important;
+  color: #710d28;
+}
+
+.card-lila .card-header {
+  background-color: var(--color-lila) !important;
+  color: white;
 }
