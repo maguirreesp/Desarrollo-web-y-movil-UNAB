@@ -33,14 +33,6 @@ Sitio web responsivo con navbar colapsable, modal de autenticación, router de p
 - HTML5
 - CSS3
 
-## Criterios de Aceptación
-- [ ] Navbar responsiva funciona en desktop y mobile
-- [ ] Dropdown "Empresa" se despliega correctamente
-- [ ] Modal abre al clickear "Acceder"
-- [ ] Todos los links navegan correctamente
-- [ ] Imágenes cargan sin errores
-- [ ] Estilos personalizados aplicados
-
 ## Cómo ejecutar
 1. Abre `index.html` en el navegador
 2. Prueba navegación en desktop y mobile
@@ -54,3 +46,37 @@ Sitio web responsivo con navbar colapsable, modal de autenticación, router de p
 - `contacto.html` - Sección contacto
 - `styles.css` - Estilos personalizados
 - `img/` - Carpeta de imágenes
+
+# Tarea 3: Aplicación Web Interactiva
+
+## Descripción
+Aplicación web dinámica que incorpora interacción mediante JavaScript y reutiliza la estructura responsiva y los componentes desarrollados en las tareas anteriores.
+
+## Características
+- ✅ Interacciones dinámicas con JavaScript
+- ✅ Validación de formularios
+- ✅ Consumo y presentación de datos
+- ✅ Diseño responsivo compatible con desktop, tablet y mobile
+- ✅ Integración con la navegación y estilos de la Tarea 2
+
+## Tecnologías
+- HTML5
+- CSS3
+- JavaScript
+- Bootstrap 5.3
+
+# Tarea 4: Prototipo en Sketch y Paleta de Colores en CSS
+
+## Descripción
+Se agrega un prototipo visual en Sketch junto con la definición de una paleta de colores aplicada en CSS para mantener coherencia visual en el proyecto.
+
+## Características
+- ✅ Prototipo en Sketch con estructura y elementos de interfaz
+- ✅ Paleta de colores definida en CSS
+- ✅ Aplicación visual consistente en componentes y secciones
+- ✅ Uso de colores corporativos para diseño web profesional
+
+## Tecnologías
+- Sketch
+- HTML5
+- CSS3
