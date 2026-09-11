@@ -114,3 +114,20 @@ Integración de una API GraphQL para consultar y presentar datos de forma dinám
 - Docker
 - JSON
 - Node.js
+
+# Tarea 6: API REST con Gateway, Autenticación JWT y Estados HTTP
+
+## Descripción del avance
+
+En este PR se implementa la capa de API REST pública con ciberdefensa y manejo estricto de protocolos.
+
+## Características
+
+- Rutas y controladores REST.
+- Operaciones CRUD con respuestas de códigos HTTP estándar (`200 OK`, `201 Created`).
+- Validaciones de seguridad y errores:
+    - Manejo explícito de `400 Bad Request` para IDs sintácticamente inválidos.
+    - Manejo explícito de `404 Not Found` para recursos no encontrados.
+- Autenticación y CORS:
+    - Generación y revocación de tokens de acceso mediante JWT.
+    - Configuración de políticas CORS para controlar el acceso a la API.
