@@ -131,3 +131,37 @@ En este PR se implementa la capa de API REST pública con ciberdefensa y manejo 
 - Autenticación y CORS:
     - Generación y revocación de tokens de acceso mediante JWT.
     - Configuración de políticas CORS para controlar el acceso a la API.
+
+# Tarea 7: Frontend Web con JavaScript e Interactividad
+
+## Descripción del avance
+
+En este PR se implementa el frontend de la aplicación a partir del prototipo visual previamente diseñado, utilizando HTML, CSS y JavaScript para construir una interfaz responsive e interactiva.
+
+El objetivo de esta tarea es transformar el diseño estático en una interfaz funcional del lado del cliente, sin depender de un backend para las interacciones principales.
+
+# Características
+- Implementación del diseño visual del prototipo.
+- Estructura de la interfaz mediante HTML.
+- Estilos, distribución y diseño responsive mediante CSS.
+- Uso de JavaScript para agregar comportamiento dinámico a la página.
+- Navegación entre las distintas secciones del sitio.
+- Adaptación de la interfaz para dispositivos de escritorio y móviles.
+- Interactividad mediante JavaScript:
+- Filtrado de pizzas según su categoría.
+- Búsqueda dinámica de productos por nombre o descripción.
+- Menú de navegación responsive para dispositivos móviles.
+- Animaciones de aparición de elementos mediante IntersectionObserver.
+- Actualización dinámica de componentes sin necesidad de recargar la página.
+- Manejo de eventos mediante addEventListener().
+
+# Gestión del pedido:
+- Botones para añadir productos al pedido.
+- Aumento y disminución de cantidades.
+- Cálculo automático del total.
+- Visualización del pedido mediante un panel interactivo.
+- Confirmación simulada del pedido desde el frontend.
+- Manejo del estado mediante URL:
+- Uso de URLSearchParams para leer parámetros desde la URL.
+- Uso de history.pushState() y history.replaceState() para actualizar la URL sin recargar la página.
+- Conservación de filtros, búsquedas y productos seleccionados mediante parámetros URL.
