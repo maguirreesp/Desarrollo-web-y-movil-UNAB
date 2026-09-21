@@ -165,3 +165,17 @@ El objetivo de esta tarea es transformar el diseño estático en una interfaz fu
 - Uso de URLSearchParams para leer parámetros desde la URL.
 - Uso de history.pushState() y history.replaceState() para actualizar la URL sin recargar la página.
 - Conservación de filtros, búsquedas y productos seleccionados mediante parámetros URL.
+
+# Tarea 8: Gestor de Secretos con Vault y API Securitizada
+
+## Descripción del avance
+
+# Caracteristicas:
+- Integración de HashiCorp Vault para gestionar secretos internos.
+- Uso de X-Gateway-Secret entre el API Gateway y el backend.
+- Autenticación de clientes mediante JWT.
+- Protección del backend contra accesos directos no autorizados.
+- Validación segura del secreto interno.
+- Implementación del endpoint protegido /health.
+- Pruebas de acceso con respuestas 403 Forbidden y 200 OK.
+- Configuración para impedir que los servicios inicien si falta el secreto requerido.
