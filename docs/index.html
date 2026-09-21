@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Pizzería La Fornace — pizzas a la piedra al horno de leña, masa de fermentación lenta y delivery a domicilio."
+    />
+    <title>La Fornace · Pizzas a la piedra con delivery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,500&family=Dancing+Script:wght@600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body class="bg-cream-50 text-wine-950 font-sans antialiased">
+    <header id="navbar" class="fixed inset-x-0 top-0 z-50 bg-transparent transition-all duration-500">
+      <nav class="container-px flex h-20 items-center justify-between">
+        <a href="#top" class="flex items-center gap-2.5" aria-label="Volver al inicio">
+          <span class="grid h-10 w-10 place-items-center rounded-full bg-wine-800/90 text-cream-50 transition-colors">
+            <span data-icon="flame" class="h-5 w-5"></span>
+          </span>
+          <span class="leading-none">
+            <span class="block font-display text-xl font-bold text-wine-900">La Fornace</span>
+            <span class="block font-script text-sm text-crust-500">pizzería · delivery</span>
+          </span>
+        </a>
+
+        <ul class="hidden items-center gap-8 md:flex">
+          <li><a href="#menu" class="text-sm font-medium text-wine-800 transition-colors hover:text-crust-500">Menú</a></li>
+          <li><a href="#historia" class="text-sm font-medium text-wine-800 transition-colors hover:text-crust-500">Historia</a></li>
+          <li><a href="#galeria" class="text-sm font-medium text-wine-800 transition-colors hover:text-crust-500">Galería</a></li>
+          <li><a href="#opiniones" class="text-sm font-medium text-wine-800 transition-colors hover:text-crust-500">Opiniones</a></li>
+          <li><a href="#contacto" class="text-sm font-medium text-wine-800 transition-colors hover:text-crust-500">Contacto</a></li>
+        </ul>
+
+        <button id="cart-trigger" class="hidden md:inline-flex btn-primary" type="button">
+          Pedir ahora
+          <span id="cart-count" class="cart-count" hidden>0</span>
+        </button>
+
+        <button
+          id="mobile-menu-button"
+          class="grid h-10 w-10 place-items-center rounded-full text-wine-800 md:hidden"
+          aria-label="Abrir menú"
+          aria-expanded="false"
+          type="button"
+        >
+          <span data-icon="menu" class="h-6 w-6"></span>
+        </button>
+      </nav>
+
+      <div id="mobile-menu" class="mobile-menu-panel md:hidden">
+        <div class="container-px space-y-1 bg-cream-50 pb-6 pt-2 shadow-inner">
+          <a href="#menu" class="block rounded-xl px-4 py-3 text-wine-800 hover:bg-wine-700 hover:text-cream-50">Menú</a>
+          <a href="#historia" class="block rounded-xl px-4 py-3 text-wine-800 hover:bg-wine-700 hover:text-cream-50">Historia</a>
+          <a href="#galeria" class="block rounded-xl px-4 py-3 text-wine-800 hover:bg-wine-700 hover:text-cream-50">Galería</a>
+          <a href="#opiniones" class="block rounded-xl px-4 py-3 text-wine-800 hover:bg-wine-700 hover:text-cream-50">Opiniones</a>
+          <a href="#contacto" class="block rounded-xl px-4 py-3 text-wine-800 hover:bg-wine-700 hover:text-cream-50">Contacto</a>
+          <button id="mobile-cart-trigger" class="btn-primary mt-2 w-full" type="button">Ver pedido</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section id="top" class="relative min-h-screen overflow-hidden">
+        <div class="absolute inset-0">
+          <img
+            src="https://images.pexels.com/photos/13736876/pexels-photo-13736876.jpeg?auto=compress&cs=tinysrgb&h=900&w=1400"
+            alt="Pizza cocinándose en horno de leña"
+            class="h-full w-full object-cover"
+          />
+          <div class="absolute inset-0 bg-gradient-to-b from-wine-950/85 via-wine-950/55 to-cream-50"></div>
+          <div class="absolute inset-0 bg-gradient-to-r from-wine-950/70 to-transparent"></div>
+        </div>
+
+        <div class="container-px relative flex min-h-screen flex-col justify-center pt-28 pb-20">
+          <div class="max-w-2xl animate-fade-up">
+            <span class="inline-flex items-center gap-2 rounded-full border border-cream-100/30 bg-wine-900/40 px-4 py-1.5 text-sm font-medium text-cream-100 backdrop-blur">
+              <span data-icon="flame" class="h-4 w-4 text-crust-400"></span>
+              Horno de leña · fermentación lenta
+            </span>
+
+            <h1 class="mt-6 font-display text-5xl font-bold leading-[1.05] text-cream-50 sm:text-6xl md:text-7xl">
+              Pizzas a la piedra,
+              <span class="block font-script text-crust-400">hechas con fuego</span>
+            </h1>
+
+            <p class="mt-6 max-w-xl text-lg leading-relaxed text-cream-100/90">
+              Masa de 48 horas, mozzarella fior di latte y tomate San Marzano.
+              Las llevamos calientes a tu casa con nuestro delivery propio.
+            </p>
+
+            <div class="mt-9 flex flex-wrap items-center gap-4">
+              <a href="#menu" class="btn-primary">Ver el menú</a>
+              <a
+                href="#historia"
+                class="inline-flex items-center justify-center gap-2 rounded-full border border-cream-100/40 bg-transparent px-6 py-3 text-sm font-semibold text-cream-50 transition-all duration-300 hover:bg-cream-50 hover:text-wine-900"
+              >
+                Nuestra historia
+              </a>
+            </div>
+
+            <div class="mt-12 flex flex-wrap gap-8 text-cream-100">
+              <div class="flex items-center gap-3">
+                <span class="grid h-11 w-11 place-items-center rounded-full bg-wine-900/40 backdrop-blur">
+                  <span data-icon="star" class="h-5 w-5 text-crust-400"></span>
+                </span>
+                <div class="leading-tight">
+                  <div class="font-display text-xl font-bold text-cream-50">4.9</div>
+                  <div class="text-xs uppercase tracking-wide text-cream-100/70">+1.200 reseñas</div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-3">
+                <span class="grid h-11 w-11 place-items-center rounded-full bg-wine-900/40 backdrop-blur">
+                  <span data-icon="timer" class="h-5 w-5 text-crust-400"></span>
+                </span>
+                <div class="leading-tight">
+                  <div class="font-display text-xl font-bold text-cream-50">30 min</div>
+                  <div class="text-xs uppercase tracking-wide text-cream-100/70">delivery promedio</div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-3">
+                <span class="grid h-11 w-11 place-items-center rounded-full bg-wine-900/40 backdrop-blur">
+                  <span data-icon="flame" class="h-5 w-5 text-crust-400"></span>
+                </span>
+                <div class="leading-tight">
+                  <div class="font-display text-xl font-bold text-cream-50">48 h</div>
+                  <div class="text-xs uppercase tracking-wide text-cream-100/70">fermentación</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="absolute bottom-0 left-0 right-0 h-16">
+          <svg viewBox="0 0 1440 80" class="h-full w-full" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0,80 C360,20 1080,20 1440,80 L1440,80 L0,80 Z" fill="#fdfbf7"></path>
+          </svg>
+        </div>
+      </section>
+
+      <section class="container-px py-20 sm:py-28">
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <article class="reveal group rounded-3xl border border-wine-700/10 bg-cream-100/60 p-7 transition-all duration-500 hover:-translate-y-1 hover:border-wine-700/20 hover:bg-cream-100 hover:shadow-xl hover:shadow-wine-900/5">
+            <span class="grid h-14 w-14 place-items-center rounded-2xl bg-wine-700 text-cream-50 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
+              <span data-icon="wheat" class="h-6 w-6"></span>
+            </span>
+            <h3 class="mt-5 font-display text-xl font-bold text-wine-900">Masa de 48 horas</h3>
+            <p class="mt-2 text-sm leading-relaxed text-wine-800/80">Fermentación lenta con masa madre para una digestión ligera y sabor inconfundible.</p>
+          </article>
+
+          <article class="reveal group rounded-3xl border border-wine-700/10 bg-cream-100/60 p-7 transition-all duration-500 hover:-translate-y-1 hover:border-wine-700/20 hover:bg-cream-100 hover:shadow-xl hover:shadow-wine-900/5" style="transition-delay:80ms">
+            <span class="grid h-14 w-14 place-items-center rounded-2xl bg-wine-700 text-cream-50 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
+              <span data-icon="leaf" class="h-6 w-6"></span>
+            </span>
+            <h3 class="mt-5 font-display text-xl font-bold text-wine-900">Ingredientes selectos</h3>
+            <p class="mt-2 text-sm leading-relaxed text-wine-800/80">Tomate San Marzano, mozzarella fior di latte y albahaca recién cortada.</p>
+          </article>
+
+          <article class="reveal group rounded-3xl border border-wine-700/10 bg-cream-100/60 p-7 transition-all duration-500 hover:-translate-y-1 hover:border-wine-700/20 hover:bg-cream-100 hover:shadow-xl hover:shadow-wine-900/5" style="transition-delay:160ms">
+            <span class="grid h-14 w-14 place-items-center rounded-2xl bg-wine-700 text-cream-50 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
+              <span data-icon="clock" class="h-6 w-6"></span>
+            </span>
+            <h3 class="mt-5 font-display text-xl font-bold text-wine-900">Listas en minutos</h3>
+            <p class="mt-2 text-sm leading-relaxed text-wine-800/80">El horno de piedra alcanza 450°C: cada pizza se cocina en apenas 90 segundos.</p>
+          </article>
+
+          <article class="reveal group rounded-3xl border border-wine-700/10 bg-cream-100/60 p-7 transition-all duration-500 hover:-translate-y-1 hover:border-wine-700/20 hover:bg-cream-100 hover:shadow-xl hover:shadow-wine-900/5" style="transition-delay:240ms">
+            <span class="grid h-14 w-14 place-items-center rounded-2xl bg-wine-700 text-cream-50 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
+              <span data-icon="truck" class="h-6 w-6"></span>
+            </span>
+            <h3 class="mt-5 font-display text-xl font-bold text-wine-900">Delivery propio</h3>
+            <p class="mt-2 text-sm leading-relaxed text-wine-800/80">Flota con bolsas térmicas para que llegue caliente, crocante y en tiempo récord.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="menu" class="bg-cream-100/50 py-20 sm:py-28">
+        <div class="container-px">
+          <header class="reveal mx-auto max-w-2xl text-center">
+            <span class="section-eyebrow">il menù</span>
+            <h2 class="section-title mt-1">Nuestras pizzas a la piedra</h2>
+            <p class="mt-4 text-wine-800/75">
+              Cada pizza se elabora al momento. Elige tu favorita y te la llevamos caliente a casa.
+            </p>
+          </header>
+
+          <div class="reveal mt-10 flex flex-col items-center gap-5 lg:flex-row lg:justify-between">
+            <div id="menu-filters" class="flex flex-wrap justify-center gap-2"></div>
+
+            <div class="relative w-full max-w-xs">
+              <span data-icon="search" class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-wine-700/50"></span>
+              <input
+                id="menu-search"
+                type="search"
+                placeholder="Buscar pizza…"
+                class="w-full rounded-full border border-wine-700/15 bg-cream-50 py-2.5 pl-11 pr-10 text-sm text-wine-900 outline-none transition focus:border-wine-700/40 focus:ring-2 focus:ring-wine-700/15"
+                autocomplete="off"
+              />
+              <button id="search-clear" class="search-clear" type="button" aria-label="Limpiar búsqueda" hidden>×</button>
+            </div>
+          </div>
+
+          <div id="menu-grid" class="mt-12 grid gap-7 sm:grid-cols-2 lg:grid-cols-3"></div>
+
+          <p id="menu-empty" class="mt-12 text-center text-wine-800/70" hidden>
+            No encontramos pizzas con ese filtro. Probá otra búsqueda.
+          </p>
+        </div>
+      </section>
+
+      <section id="historia" class="container-px py-20 sm:py-28">
+        <div class="grid items-center gap-12 lg:grid-cols-2">
+          <div class="reveal relative">
+            <div class="overflow-hidden rounded-[2rem] shadow-2xl shadow-wine-900/15">
+              <img
+                src="https://images.pexels.com/photos/13193300/pexels-photo-13193300.jpeg?auto=compress&cs=tinysrgb&h=900&w=1200"
+                alt="Horno de piedra tradicional"
+                class="aspect-[4/5] w-full object-cover"
+              />
+            </div>
+            <div class="absolute -bottom-6 -right-4 hidden rounded-2xl bg-wine-700 px-7 py-5 text-cream-50 shadow-xl sm:block">
+              <div class="font-display text-4xl font-bold">39 años</div>
+              <div class="text-sm text-cream-100/80">cuidando el fuego</div>
+            </div>
+          </div>
+
+          <div class="reveal">
+            <span class="section-eyebrow">la nostra storia</span>
+            <h2 class="section-title mt-1">Del horno de leña a tu mesa</h2>
+            <p class="mt-4 text-wine-800/80">
+              Empezamos como un pequeño horno de barrio. Hoy seguimos amasando a mano, cocinando con leña de roble y entregando cada pizza como si fuera para nuestra propia familia.
+            </p>
+
+            <ol class="mt-8 space-y-6 border-l-2 border-wine-700/20 pl-6">
+              <li class="relative">
+                <span class="absolute -left-[31px] top-1 grid h-5 w-5 place-items-center rounded-full bg-wine-700 ring-4 ring-cream-50"></span>
+                <div class="font-display text-lg font-bold text-crust-600">1987</div>
+                <p class="text-wine-800/80">Don Salvatore abre el primer horno de leña en el barrio viejo.</p>
+              </li>
+              <li class="relative">
+                <span class="absolute -left-[31px] top-1 grid h-5 w-5 place-items-center rounded-full bg-wine-700 ring-4 ring-cream-50"></span>
+                <div class="font-display text-lg font-bold text-crust-600">2003</div>
+                <p class="text-wine-800/80">Sumamos delivery propio para llevar la pizza caliente a cada rincón.</p>
+              </li>
+              <li class="relative">
+                <span class="absolute -left-[31px] top-1 grid h-5 w-5 place-items-center rounded-full bg-wine-700 ring-4 ring-cream-50"></span>
+                <div class="font-display text-lg font-bold text-crust-600">2015</div>
+                <p class="text-wine-800/80">Reconocimiento como una de las 10 mejores pizzerías artesanales.</p>
+              </li>
+              <li class="relative">
+                <span class="absolute -left-[31px] top-1 grid h-5 w-5 place-items-center rounded-full bg-wine-700 ring-4 ring-cream-50"></span>
+                <div class="font-display text-lg font-bold text-crust-600">Hoy</div>
+                <p class="text-wine-800/80">Tres generaciones cuidando la masa, el fuego y el sabor.</p>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <section id="galeria" class="bg-cream-100/50 py-20 sm:py-28">
+        <div class="container-px">
+          <header class="reveal mx-auto max-w-2xl text-center">
+            <span class="section-eyebrow">galleria</span>
+            <h2 class="section-title mt-1">El fuego, la masa, el momento</h2>
+            <p class="mt-4 text-wine-800/75">
+              Una mirada dentro de nuestro horno y de cada pizza antes de salir hacia tu casa.
+            </p>
+          </header>
+
+          <div id="gallery-grid" class="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6"></div>
+        </div>
+      </section>
+
+      <section id="opiniones" class="container-px py-20 sm:py-28">
+        <header class="reveal mx-auto max-w-2xl text-center">
+          <span class="section-eyebrow">recensioni</span>
+          <h2 class="section-title mt-1">Lo que dicen nuestros clientes</h2>
+        </header>
+
+        <div id="testimonials-grid" class="mt-12 grid gap-7 md:grid-cols-3"></div>
+      </section>
+
+      <section id="contacto" class="relative overflow-hidden py-20 sm:py-28">
+        <div class="container-px">
+          <div class="grid items-stretch gap-10 lg:grid-cols-2">
+            <div class="reveal relative overflow-hidden rounded-[2rem] bg-wine-800 p-9 text-cream-50 shadow-2xl shadow-wine-900/20 sm:p-12">
+              <div class="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-wine-700/40 blur-2xl"></div>
+              <div class="absolute -bottom-16 -left-10 h-56 w-56 rounded-full bg-crust-500/20 blur-3xl"></div>
+
+              <div class="relative">
+                <span class="font-script text-2xl text-crust-400">delivery</span>
+                <h2 class="mt-1 font-display text-3xl font-bold sm:text-4xl">
+                  Pide tu pizza y te la llevamos en 30 minutos
+                </h2>
+                <p class="mt-4 text-cream-100/85">
+                  Cobertura en toda la zona centro y barrios aledaños. Pedidos online las 24 horas, cocina abierta de 11:00 a 23:30.
+                </p>
+
+                <div class="mt-8 space-y-4">
+                  <div class="flex gap-3">
+                    <span class="mt-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-full bg-wine-700/60 text-cream-50"><span data-icon="bike" class="h-5 w-5"></span></span>
+                    <div><div class="font-semibold text-cream-50">Zonas de entrega</div><div class="text-sm text-cream-100/80">Winterfell, Kingslanding, Dragonstone, Braavos.</div></div>
+                  </div>
+                  <div class="flex gap-3">
+                    <span class="mt-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-full bg-wine-700/60 text-cream-50"><span data-icon="clock" class="h-5 w-5"></span></span>
+                    <div><div class="font-semibold text-cream-50">Horario</div><div class="text-sm text-cream-100/80">Lun a Dom · 11:00 – 23:30</div></div>
+                  </div>
+                  <div class="flex gap-3">
+                    <span class="mt-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-full bg-wine-700/60 text-cream-50"><span data-icon="phone" class="h-5 w-5"></span></span>
+                    <div><div class="font-semibold text-cream-50">Teléfono</div><div class="text-sm text-cream-100/80">+569 1234 5678</div></div>
+                  </div>
+                  <div class="flex gap-3">
+                    <span class="mt-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-full bg-wine-700/60 text-cream-50"><span data-icon="map" class="h-5 w-5"></span></span>
+                    <div><div class="font-semibold text-cream-50">Local</div><div class="text-sm text-cream-100/80">Avenida Siempre Viva, 742.</div></div>
+                  </div>
+                </div>
+
+                <div class="mt-8 flex flex-wrap gap-3">
+                  <button id="contact-order-button" class="btn-primary bg-crust-500 hover:bg-crust-600" type="button">Hacer pedido</button>
+                  <a href="tel:+541112345678" class="inline-flex items-center justify-center gap-2 rounded-full border border-cream-100/30 px-6 py-3 text-sm font-semibold text-cream-50 transition hover:bg-cream-50 hover:text-wine-900">Llamar ahora</a>
+                </div>
+
+                <div class="mt-8 flex gap-4">
+                  <a href="#" aria-label="Instagram" class="grid h-11 w-11 place-items-center rounded-full bg-wine-700/60 text-cream-50 transition hover:bg-cream-50 hover:text-wine-900">
+                    <span data-icon="instagram" class="h-5 w-5"></span>
+                  </a>
+                  <a href="#" aria-label="Facebook" class="grid h-11 w-11 place-items-center rounded-full bg-wine-700/60 text-cream-50 transition hover:bg-cream-50 hover:text-wine-900">
+                    <span data-icon="facebook" class="h-5 w-5"></span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div class="reveal overflow-hidden rounded-[2rem] shadow-2xl shadow-wine-900/15">
+              <img
+                src="https://images.pexels.com/photos/16750771/pexels-photo-16750771.jpeg?auto=compress&cs=tinysrgb&h=700&w=1000"
+                alt="Delivery de La Fornace"
+                class="h-full min-h-[420px] w-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="bg-wine-950 text-cream-100/70">
+      <div class="container-px py-14">
+        <div class="grid gap-10 md:grid-cols-4">
+          <div class="md:col-span-2">
+            <div class="flex items-center gap-2.5">
+              <span class="grid h-10 w-10 place-items-center rounded-full bg-wine-700 text-cream-50"><span data-icon="flame" class="h-5 w-5"></span></span>
+              <span class="font-display text-xl font-bold text-cream-50">La Fornace</span>
+            </div>
+            <p class="mt-4 max-w-sm text-sm leading-relaxed">
+              Pizzería artesanal a la piedra. Horno de leña, masa de fermentación lenta y delivery propio desde 1987.
+            </p>
+          </div>
+
+          <div>
+            <h4 class="font-display text-base font-semibold text-cream-50">Navegación</h4>
+            <ul class="mt-4 space-y-2 text-sm">
+              <li><a href="#menu" class="hover:text-crust-400">Menú</a></li>
+              <li><a href="#historia" class="hover:text-crust-400">Historia</a></li>
+              <li><a href="#galeria" class="hover:text-crust-400">Galería</a></li>
+              <li><a href="#opiniones" class="hover:text-crust-400">Opiniones</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-display text-base font-semibold text-cream-50">Contacto</h4>
+            <ul class="mt-4 space-y-2 text-sm">
+              <li>Avenida Siempre Viva 742</li>
+              <li>+569 1234 5678</li>
+              <li>hola@lafornace.com</li>
+              <li>Lun a Dom · 11:00 – 23:30</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mt-12 flex flex-col items-center justify-between gap-4 border-t border-wine-800/50 pt-6 text-xs sm:flex-row">
+          <p>© <span id="year"></span> La Fornace · Pizzas a la piedra con delivery</p>
+          <p class="text-cream-100/50">Prototipo de diseño · hecho con fuego</p>
+        </div>
+      </div>
+    </footer>
+
+    <div id="cart-overlay" class="cart-overlay" aria-hidden="true"></div>
+    <aside id="cart-drawer" class="cart-drawer" aria-label="Pedido" aria-hidden="true">
+      <div class="cart-head">
+        <div>
+          <div class="font-script text-lg text-crust-500">il tuo ordine</div>
+          <h2>Tu pedido</h2>
+        </div>
+        <button id="cart-close" class="cart-close" type="button" aria-label="Cerrar pedido">
+          <span data-icon="x" class="h-5 w-5"></span>
+        </button>
+      </div>
+      <div id="cart-items" class="cart-items"></div>
+      <div class="cart-foot">
+        <div class="cart-total"><span>Total</span><strong id="cart-total">€0.00</strong></div>
+        <button id="checkout-button" class="btn-primary w-full" type="button">Confirmar pedido</button>
+        <p class="cart-note"> Prototipo académico. No se procesa un pago real.</p>
+      </div>
+    </aside>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
