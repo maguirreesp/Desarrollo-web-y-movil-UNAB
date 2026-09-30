@@ -172,10 +172,12 @@ El objetivo de esta tarea es transformar el diseño estático en una interfaz fu
 
 # Caracteristicas:
 - Integración de HashiCorp Vault para gestionar secretos internos.
-- Uso de X-Gateway-Secret entre el API Gateway y el backend.
-- Autenticación de clientes mediante JWT.
+- Almacenamiento de `client_token` y `backend_shared_secret` en Vault.
+- Lectura directa de secretos desde Vault por parte del API Gateway.
+- Uso de `X-Gateway-Secret` entre el API Gateway y el backend.
+- Autenticación de clientes mediante Bearer Token y JWT.
 - Protección del backend contra accesos directos no autorizados.
-- Validación segura del secreto interno.
-- Implementación del endpoint protegido /health.
-- Pruebas de acceso con respuestas 403 Forbidden y 200 OK.
-- Configuración para impedir que los servicios inicien si falta el secreto requerido.
+- Validación segura del secreto interno mediante comparación timing-safe.
+- Implementación del endpoint protegido `/health`.
+- Pruebas de acceso con respuestas `401 Unauthorized`, `403 Forbidden` y `200 OK`.
+- Configuración para impedir que los servicios inicien si faltan los secretos requeridos.

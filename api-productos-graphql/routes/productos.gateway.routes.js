@@ -1,10 +1,12 @@
 import "dotenv/config";
 
+import crypto from "crypto";
+import jwt from "jsonwebtoken";
 import { Router } from "express";
 
 import {
-  verificarToken
-} from "../middleware/auth.js";
+  cargarSecretosVault
+} from "../services/vault.js";
 
 const router = Router();
 
@@ -12,24 +14,127 @@ const BACKEND_URL =
   process.env.BACKEND_PRODUCTOS_URL
   || "http://localhost:5000";
 
-const INTERNAL_GATEWAY_SECRET =
-  process.env.INTERNAL_GATEWAY_SECRET;
+const JWT_SECRET =
+  process.env.JWT_SECRET
+  || "clave-secreta-dev";
 
 /*
- * El Gateway tampoco debe iniciar sin
- * el secreto interno.
+ * El Gateway consulta Vault directamente
+ * al iniciarse.
  */
-if (!INTERNAL_GATEWAY_SECRET) {
-  throw new Error(
-    "Falta la variable INTERNAL_GATEWAY_SECRET"
+const {
+  clientToken,
+  backendSharedSecret
+} = await cargarSecretosVault();
+
+console.log(
+  "[gateway] Secretos cargados desde Vault"
+);
+
+function compararSeguro(
+  recibido,
+  esperado
+) {
+  if (!recibido || !esperado) {
+    return false;
+  }
+
+  const hashRecibido =
+    crypto
+      .createHash("sha256")
+      .update(recibido)
+      .digest();
+
+  const hashEsperado =
+    crypto
+      .createHash("sha256")
+      .update(esperado)
+      .digest();
+
+  return crypto.timingSafeEqual(
+    hashRecibido,
+    hashEsperado
   );
 }
 
 /*
- * El cliente primero debe superar
- * la autenticación JWT.
+ * Permite dos mecanismos:
+ *
+ * 1. client_token almacenado en Vault
+ * 2. JWT que ya utilizaba el proyecto
+ *
+ * Así no rompemos el frontend existente.
  */
-router.use(verificarToken);
+function verificarCliente(
+  req,
+  res,
+  next
+) {
+  const authorization =
+    req.headers.authorization;
+
+  if (
+    !authorization
+    || !authorization.startsWith(
+      "Bearer "
+    )
+  ) {
+    return res.status(401).json({
+      error:
+        "Token de autorización requerido"
+    });
+  }
+
+  const token =
+    authorization.substring(7);
+
+  /*
+   * Primero comprobamos el token
+   * de cliente almacenado en Vault.
+   */
+  if (
+    compararSeguro(
+      token,
+      clientToken
+    )
+  ) {
+    req.authType =
+      "vault-client-token";
+
+    return next();
+  }
+
+  /*
+   * Si no corresponde al token de Vault,
+   * comprobamos si es un JWT válido.
+   */
+  jwt.verify(
+    token,
+    JWT_SECRET,
+    (error, decoded) => {
+      if (error) {
+        return res
+          .status(401)
+          .json({
+            error:
+              "Token inválido"
+          });
+      }
+
+      req.usuario =
+        decoded;
+
+      req.authType =
+        "jwt";
+
+      next();
+    }
+  );
+}
+
+router.use(
+  verificarCliente
+);
 
 async function reenviar(
   req,
@@ -44,8 +149,12 @@ async function reenviar(
         "Content-Type":
           "application/json",
 
+        /*
+         * Este valor viene directamente
+         * desde Vault.
+         */
         "X-Gateway-Secret":
-          INTERNAL_GATEWAY_SECRET
+          backendSharedSecret
       }
     };
 
@@ -55,7 +164,9 @@ async function reenviar(
       )
     ) {
       opciones.body =
-        JSON.stringify(req.body);
+        JSON.stringify(
+          req.body
+        );
     }
 
     const respuesta =
@@ -80,13 +191,16 @@ async function reenviar(
       .json(data);
   } catch (error) {
     console.error(
-      "[gateway] Error:",
+      "[gateway] Backend no disponible:",
       error.message
     );
 
-    return res.status(502).json({
-      error: "Backend no disponible"
-    });
+    return res
+      .status(502)
+      .json({
+        error:
+          "Backend no disponible"
+      });
   }
 }
 
@@ -98,17 +212,14 @@ router.get(
         req.query
       ).toString();
 
-    const path =
+    reenviar(
+      req,
+      res,
       `/productos${
         query
           ? `?${query}`
           : ""
-      }`;
-
-    reenviar(
-      req,
-      res,
-      path
+      }`
     );
   }
 );
