@@ -181,3 +181,23 @@ El objetivo de esta tarea es transformar el diseño estático en una interfaz fu
 - Implementación del endpoint protegido `/health`.
 - Pruebas de acceso con respuestas `401 Unauthorized`, `403 Forbidden` y `200 OK`.
 - Configuración para impedir que los servicios inicien si faltan los secretos requeridos.
+
+# Tarea 9: Introspección de Tokens, Propagación de Identidad y RBAC
+
+## Descripción del avance
+
+Se implementó un servicio de autenticación separado para validar tokens mediante introspección y permitir que el API Gateway propague la identidad del usuario hacia el backend.
+
+## Características
+
+- Creación de `out-service` para autenticación.
+- Implementación de `/login`, `/introspect` y `/logout`.
+- Tokens temporales con expiración.
+- Protección mediante `X-Gateway-Out-Secret`.
+- Introspección de tokens desde el API Gateway.
+- Propagación de `X-Authenticated-User` y `X-Authenticated-Roles`.
+- Mantención de `X-Gateway-Secret` entre Gateway y Backend.
+- Implementación de control de acceso por roles (RBAC).
+- Lecturas permitidas para `user`.
+- `POST`, `PUT` y `DELETE` restringidos a `admin`.
+- Manejo de respuestas `200`, `401`, `403`, `502` y `503`.
