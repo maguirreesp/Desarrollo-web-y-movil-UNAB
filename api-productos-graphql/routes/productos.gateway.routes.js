@@ -1,7 +1,4 @@
 import "dotenv/config";
-
-import crypto from "crypto";
-import jwt from "jsonwebtoken";
 import { Router } from "express";
 
 import {
@@ -11,73 +8,29 @@ import {
 const router = Router();
 
 const BACKEND_URL =
-  process.env.BACKEND_PRODUCTOS_URL
-  || "http://localhost:5000";
+  process.env.BACKEND_PRODUCTOS_URL ||
+  "http://localhost:5000";
 
-const JWT_SECRET =
-  process.env.JWT_SECRET
-  || "clave-secreta-dev";
+const OUT_SERVICE_URL =
+  process.env.OUT_SERVICE_URL ||
+  "http://localhost:8100";
 
-/*
- * El Gateway consulta Vault directamente
- * al iniciarse.
- */
 const {
-  clientToken,
-  backendSharedSecret
+  backendSharedSecret,
+  gatewayOutSecret
 } = await cargarSecretosVault();
 
-console.log(
-  "[gateway] Secretos cargados desde Vault"
-);
-
-function compararSeguro(
-  recibido,
-  esperado
-) {
-  if (!recibido || !esperado) {
-    return false;
-  }
-
-  const hashRecibido =
-    crypto
-      .createHash("sha256")
-      .update(recibido)
-      .digest();
-
-  const hashEsperado =
-    crypto
-      .createHash("sha256")
-      .update(esperado)
-      .digest();
-
-  return crypto.timingSafeEqual(
-    hashRecibido,
-    hashEsperado
-  );
-}
-
-/*
- * Permite dos mecanismos:
- *
- * 1. client_token almacenado en Vault
- * 2. JWT que ya utilizaba el proyecto
- *
- * Así no rompemos el frontend existente.
- */
-function verificarCliente(
+async function introspectarToken(
   req,
   res,
   next
 ) {
   const authorization =
-    req.headers.authorization;
+    req.get("Authorization");
 
   if (
-    !authorization
-    || !authorization.startsWith(
-      "Bearer "
-    )
+    !authorization ||
+    !authorization.startsWith("Bearer ")
   ) {
     return res.status(401).json({
       error:
@@ -86,55 +39,79 @@ function verificarCliente(
   }
 
   const token =
-    authorization.substring(7);
+    authorization
+      .substring(7)
+      .trim();
 
-  /*
-   * Primero comprobamos el token
-   * de cliente almacenado en Vault.
-   */
-  if (
-    compararSeguro(
-      token,
-      clientToken
-    )
-  ) {
-    req.authType =
-      "vault-client-token";
+  try {
+    const respuesta = await fetch(
+      `${OUT_SERVICE_URL}/introspect`,
+      {
+        method: "POST",
 
-    return next();
-  }
+        headers: {
+          "Content-Type":
+            "application/json",
 
-  /*
-   * Si no corresponde al token de Vault,
-   * comprobamos si es un JWT válido.
-   */
-  jwt.verify(
-    token,
-    JWT_SECRET,
-    (error, decoded) => {
-      if (error) {
-        return res
-          .status(401)
-          .json({
-            error:
-              "Token inválido"
-          });
+          "X-Gateway-Out-Secret":
+            gatewayOutSecret
+        },
+
+        body: JSON.stringify({
+          token
+        })
       }
+    );
 
-      req.usuario =
-        decoded;
-
-      req.authType =
-        "jwt";
-
-      next();
+    if (!respuesta.ok) {
+      return res.status(502).json({
+        error:
+          "Error al consultar el servicio de autenticación"
+      });
     }
-  );
+
+    const data =
+      await respuesta.json();
+
+    if (!data.active) {
+      return res.status(401).json({
+        error:
+          "Token inválido o expirado"
+      });
+    }
+
+    if (!data.username) {
+      return res.status(502).json({
+        error:
+          "Respuesta inválida del servicio de autenticación"
+      });
+    }
+
+    req.identidad = {
+      user_id: data.user_id,
+      username: data.username,
+      roles:
+        Array.isArray(data.roles)
+          ? data.roles
+          : []
+    };
+
+    next();
+
+  } catch (error) {
+    console.error(
+      "[gateway] Introspección fallida:",
+      error.message
+    );
+
+    return res.status(503).json({
+      error:
+        "Servicio de autenticación no disponible"
+    });
+  }
 }
 
-router.use(
-  verificarCliente
-);
+router.use(introspectarToken);
 
 async function reenviar(
   req,
@@ -149,12 +126,14 @@ async function reenviar(
         "Content-Type":
           "application/json",
 
-        /*
-         * Este valor viene directamente
-         * desde Vault.
-         */
         "X-Gateway-Secret":
-          backendSharedSecret
+          backendSharedSecret,
+
+        "X-Authenticated-User":
+          req.identidad.username,
+
+        "X-Authenticated-Roles":
+          req.identidad.roles.join(",")
       }
     };
 
@@ -164,23 +143,16 @@ async function reenviar(
       )
     ) {
       opciones.body =
-        JSON.stringify(
-          req.body
-        );
+        JSON.stringify(req.body);
     }
 
-    const respuesta =
-      await fetch(
-        `${BACKEND_URL}${path}`,
-        opciones
-      );
+    const respuesta = await fetch(
+      `${BACKEND_URL}${path}`,
+      opciones
+    );
 
-    if (
-      respuesta.status === 204
-    ) {
-      return res
-        .status(204)
-        .send();
+    if (respuesta.status === 204) {
+      return res.status(204).send();
     }
 
     const data =
@@ -189,83 +161,62 @@ async function reenviar(
     return res
       .status(respuesta.status)
       .json(data);
+
   } catch (error) {
     console.error(
       "[gateway] Backend no disponible:",
       error.message
     );
 
-    return res
-      .status(502)
-      .json({
-        error:
-          "Backend no disponible"
-      });
+    return res.status(502).json({
+      error: "Backend no disponible"
+    });
   }
 }
 
-router.get(
-  "/",
-  (req, res) => {
-    const query =
-      new URLSearchParams(
-        req.query
-      ).toString();
+router.get("/", (req, res) => {
+  const query =
+    new URLSearchParams(
+      req.query
+    ).toString();
 
-    reenviar(
-      req,
-      res,
-      `/productos${
-        query
-          ? `?${query}`
-          : ""
-      }`
-    );
-  }
-);
+  reenviar(
+    req,
+    res,
+    `/productos${query ? `?${query}` : ""}`
+  );
+});
 
-router.get(
-  "/:id",
-  (req, res) => {
-    reenviar(
-      req,
-      res,
-      `/productos/${req.params.id}`
-    );
-  }
-);
+router.get("/:id", (req, res) => {
+  reenviar(
+    req,
+    res,
+    `/productos/${req.params.id}`
+  );
+});
 
-router.post(
-  "/",
-  (req, res) => {
-    reenviar(
-      req,
-      res,
-      "/productos"
-    );
-  }
-);
+router.post("/", (req, res) => {
+  reenviar(
+    req,
+    res,
+    "/productos"
+  );
+});
 
-router.put(
-  "/:id",
-  (req, res) => {
-    reenviar(
-      req,
-      res,
-      `/productos/${req.params.id}`
-    );
-  }
-);
+router.put("/:id", (req, res) => {
+  reenviar(
+    req,
+    res,
+    `/productos/${req.params.id}`
+  );
+});
 
-router.delete(
-  "/:id",
-  (req, res) => {
-    reenviar(
-      req,
-      res,
-      `/productos/${req.params.id}`
-    );
-  }
-);
+router.delete("/:id", (req, res) => {
+  reenviar(
+    req,
+    res,
+    `/productos/${req.params.id}`
+  );
+});
 
 export default router;

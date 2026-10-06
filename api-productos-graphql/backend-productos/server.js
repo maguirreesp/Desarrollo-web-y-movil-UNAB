@@ -2,6 +2,9 @@ import crypto from "crypto";
 import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
+import {
+  cargarIdentidad
+} from "../middleware/identity.js";
 
 import productosRoutes from "../routes/productos.routes.js";
 
@@ -91,6 +94,7 @@ app.get("/health", (req, res) => {
 
 app.use(
   "/productos",
+  cargarIdentidad,
   productosRoutes
 );
 

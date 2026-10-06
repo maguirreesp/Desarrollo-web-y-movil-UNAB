@@ -1,8 +1,8 @@
 import "dotenv/config";
 
 const VAULT_ADDR =
-  process.env.VAULT_ADDR
-  || "http://127.0.0.1:8200";
+  process.env.VAULT_ADDR ||
+  "http://127.0.0.1:8200";
 
 const VAULT_TOKEN =
   process.env.VAULT_TOKEN;
@@ -36,8 +36,8 @@ export async function cargarSecretosVault() {
     resultado?.data?.data;
 
   if (
-    !secretos?.client_token
-    || !secretos?.backend_shared_secret
+    !secretos?.backend_shared_secret ||
+    !secretos?.gateway_out_secret
   ) {
     throw new Error(
       "Vault no contiene los secretos requeridos"
@@ -45,10 +45,10 @@ export async function cargarSecretosVault() {
   }
 
   return {
-    clientToken:
-      secretos.client_token,
-
     backendSharedSecret:
-      secretos.backend_shared_secret
+      secretos.backend_shared_secret,
+
+    gatewayOutSecret:
+      secretos.gateway_out_secret
   };
 }

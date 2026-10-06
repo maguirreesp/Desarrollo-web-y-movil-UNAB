@@ -9,7 +9,7 @@ import mongoose from "mongoose";
 
 import { resolvers } from "./schema/resolvers.js";
 import { typeDefs } from "./schema/typeDefs.js";
-import authRoutes from "./routes/auth.routes.js";
+import authRoutes from "./routes/auth.gateway.routes.js";
 import productosGatewayRoutes from "./routes/productos.gateway.routes.js";
 
 dotenv.config();
