@@ -201,3 +201,27 @@ Se implementó un servicio de autenticación separado para validar tokens median
 - Lecturas permitidas para `user`.
 - `POST`, `PUT` y `DELETE` restringidos a `admin`.
 - Manejo de respuestas `200`, `401`, `403`, `502` y `503`.
+
+# Tarea 10: Brokers de Mensajería con Stomp y ActiveMQ
+
+## Descripción del avance
+
+Se implementa comunicación asíncrona entre servicios mediante una cola de mensajes. Un productor publica pedidos en distintos formatos y un consumidor los recibe, interpreta y confirma, usando el protocolo Stomp sobre Apache ActiveMQ Classic.
+
+## Características
+
+- Broker Apache ActiveMQ Classic 6.4.0 ejecutado localmente, con el conector Stomp habilitado en `conf/activemq.xml` (puerto 61613, solo local).
+- Productor (`productor.py`) que publica pedidos en la cola `/queue/pedidos`.
+- Cuatro formatos de mensaje: texto libre, ancho fijo (36 caracteres), XML y JSON.
+- Cabeceras `content-type`, `x-formato` y `persistent` para describir y persistir cada mensaje.
+- Consumidor (`consumidor.py`) suscrito con confirmación individual (`client-individual`).
+- Interpretación según el formato, con validación del contrato (ancho fijo de 36 caracteres, raíz `<pedido>` en XML).
+- Rechazo de mensajes inválidos con `nack`, sin reencolar.
+- Parámetros de conexión por consola con `argparse`.
+
+## Cómo ejecutar
+
+1. Iniciar ActiveMQ: `bin\activemq start`.
+2. Instalar la dependencia: `pip install stomp.py`.
+3. En una terminal: `python consumidor.py`.
+4. En otra: `python productor.py --formato json --id 123 --cliente "Maureen Aguirre" --monto 123.45`.

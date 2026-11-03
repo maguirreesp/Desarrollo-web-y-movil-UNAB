@@ -1,0 +1,55 @@
+﻿.gitignore
+estructura.txt
+package-lock.json
+README.md
+.vscode\launch.json
+api-productos-graphql\.gitignore
+api-productos-graphql\index.js
+api-productos-graphql\package-lock.json
+api-productos-graphql\package.json
+api-productos-graphql\seed-productos.js
+api-productos-graphql\backend-productos\server.js
+api-productos-graphql\controllers\productos.controller.js
+api-productos-graphql\middleware\auth.js
+api-productos-graphql\middleware\identity.js
+api-productos-graphql\models\Producto.js
+api-productos-graphql\out-service\server.js
+api-productos-graphql\routes\auth.gateway.routes.js
+api-productos-graphql\routes\auth.routes.js
+api-productos-graphql\routes\productos.gateway.routes.js
+api-productos-graphql\routes\productos.routes.js
+api-productos-graphql\schema\resolvers.js
+api-productos-graphql\schema\typeDefs.js
+api-productos-graphql\services\vault.js
+brokers-stomp\.gitignore
+brokers-stomp\consumidor.py
+brokers-stomp\productor.py
+docs\app.js
+docs\index.html
+docs\README.md
+docs\styles.css
+docs\js\api.js
+docs\js\main.js
+frontend\app.js
+frontend\index.html
+frontend\README.md
+frontend\styles.css
+frontend\js\api.js
+frontend\js\main.js
+tarea 1 diseñowebmovil\index.html
+tarea 1 diseñowebmovil\styles.css
+tarea 1 diseñowebmovil\.vscode\launch.json
+tarea 2 y tarea3\contacto.html
+tarea 2 y tarea3\empresa.html
+tarea 2 y tarea3\index.html
+tarea 2 y tarea3\productos.html
+tarea 2 y tarea3\servicios.html
+tarea 2 y tarea3\styles.css
+tarea 2 y tarea3\test.html
+tarea 2 y tarea3\img\imagen1.jpg
+tarea 2 y tarea3\img\imagen2.jpg
+tarea 2 y tarea3\img\imagen3.jpg
+tarea 2 y tarea3\img\imagen4.jpg
+tarea 2 y tarea3\img\imagen5.jpg
+tarea 4 prototipo\paleta.css
+tarea 4 prototipo\img\Prototipo.png

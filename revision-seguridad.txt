@@ -1,0 +1,871 @@
+﻿
+========== api-productos-graphql\backend-productos\server.js ==========
+import crypto from "crypto";
+import dotenv from "dotenv";
+import express from "express";
+import mongoose from "mongoose";
+import {
+  cargarIdentidad
+} from "../middleware/identity.js";
+
+import productosRoutes from "../routes/productos.routes.js";
+
+dotenv.config();
+
+const app = express();
+
+app.use(express.json());
+
+const INTERNAL_GATEWAY_SECRET =
+  process.env.INTERNAL_GATEWAY_SECRET;
+
+/*
+ * El backend no puede arrancar si no existe
+ * el secreto interno.
+ */
+if (!INTERNAL_GATEWAY_SECRET) {
+  throw new Error(
+    "Falta la variable INTERNAL_GATEWAY_SECRET"
+  );
+}
+
+/*
+ * Compara ambos secretos de forma segura.
+ * Primero genera un SHA-256 para obtener
+ * buffers del mismo tamaÃ±o.
+ */
+function compararSecretos(recibido, esperado) {
+  if (!recibido || !esperado) {
+    return false;
+  }
+
+  const hashRecibido = crypto
+    .createHash("sha256")
+    .update(recibido)
+    .digest();
+
+  const hashEsperado = crypto
+    .createHash("sha256")
+    .update(esperado)
+    .digest();
+
+  return crypto.timingSafeEqual(
+    hashRecibido,
+    hashEsperado
+  );
+}
+
+/*
+ * Middleware que comprueba que la peticiÃ³n
+ * venga realmente desde el Gateway.
+ */
+function verificarGateway(req, res, next) {
+  const secretoRecibido =
+    req.get("X-Gateway-Secret");
+
+  const valido = compararSecretos(
+    secretoRecibido,
+    INTERNAL_GATEWAY_SECRET
+  );
+
+  if (!valido) {
+    return res.status(403).json({
+      error:
+        "Solicitud no autorizada desde gateway"
+    });
+  }
+
+  next();
+}
+
+/*
+ * Todos los endpoints posteriores quedan
+ * protegidos por el secreto interno.
+ */
+app.use(verificarGateway);
+
+/*
+ * Endpoint solicitado en el ejercicio.
+ */
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    service: "backend-productos"
+  });
+});
+
+app.use(
+  "/productos",
+  cargarIdentidad,
+  productosRoutes
+);
+
+await mongoose.connect(
+  process.env.MONGO_URI
+);
+
+console.log(
+  "[backend-productos] Conectado a MongoDB"
+);
+
+const PUERTO =
+  process.env.PORT_BACKEND || 5000;
+
+app.listen(PUERTO, () => {
+  console.log(
+    `[backend-productos] Escuchando en http://localhost:${PUERTO}`
+  );
+});
+
+========== api-productos-graphql\out-service\server.js ==========
+import crypto from "crypto";
+import dotenv from "dotenv";
+import express from "express";
+
+dotenv.config();
+
+const app = express();
+app.use(express.json());
+
+const PORT = process.env.PORT_OUT || 8100;
+
+const TOKEN_LIFETIME_SECONDS =
+  Number(process.env.TOKEN_LIFETIME_SECONDS || 900);
+
+const GATEWAY_OUT_SECRET =
+  process.env.GATEWAY_OUT_SECRET;
+
+if (!GATEWAY_OUT_SECRET) {
+  throw new Error(
+    "Falta la variable GATEWAY_OUT_SECRET"
+  );
+}
+
+const usuarios = {
+  cliente: {
+    user_id: "user-001",
+    username: "cliente",
+    password: "cliente123",
+    roles: ["user"]
+  },
+
+  admin: {
+    user_id: "admin-001",
+    username: "admin",
+    password: "1234",
+    roles: ["admin"]
+  }
+};
+
+const sesiones = new Map();
+
+function compararSeguro(valorA, valorB) {
+  if (!valorA || !valorB) {
+    return false;
+  }
+
+  const hashA = crypto
+    .createHash("sha256")
+    .update(valorA)
+    .digest();
+
+  const hashB = crypto
+    .createHash("sha256")
+    .update(valorB)
+    .digest();
+
+  return crypto.timingSafeEqual(
+    hashA,
+    hashB
+  );
+}
+
+function verificarGateway(req, res, next) {
+  const secreto =
+    req.get("X-Gateway-Out-Secret");
+
+  if (
+    !compararSeguro(
+      secreto,
+      GATEWAY_OUT_SECRET
+    )
+  ) {
+    return res.status(403).json({
+      error:
+        "Solicitud no autorizada desde gateway"
+    });
+  }
+
+  next();
+}
+
+app.post("/login", (req, res) => {
+  const {
+    username,
+    password
+  } = req.body;
+
+  const usuario =
+    usuarios[username];
+
+  if (
+    !usuario ||
+    !compararSeguro(
+      password,
+      usuario.password
+    )
+  ) {
+    return res.status(401).json({
+      error: "Credenciales invÃ¡lidas"
+    });
+  }
+
+  const accessToken =
+    crypto
+      .randomBytes(32)
+      .toString("hex");
+
+  const expiresAt =
+    Date.now()
+    + TOKEN_LIFETIME_SECONDS * 1000;
+
+  sesiones.set(
+    accessToken,
+    {
+      user_id: usuario.user_id,
+      username: usuario.username,
+      roles: usuario.roles,
+      expiresAt
+    }
+  );
+
+  return res.status(200).json({
+    access_token: accessToken,
+    token_type: "bearer",
+    expires_in:
+      TOKEN_LIFETIME_SECONDS,
+    user_id: usuario.user_id,
+    username: usuario.username,
+    roles: usuario.roles
+  });
+});
+
+app.post(
+  "/introspect",
+  verificarGateway,
+  (req, res) => {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(200).json({
+        active: false
+      });
+    }
+
+    const sesion =
+      sesiones.get(token);
+
+    if (!sesion) {
+      return res.status(200).json({
+        active: false
+      });
+    }
+
+    if (
+      Date.now()
+      >= sesion.expiresAt
+    ) {
+      sesiones.delete(token);
+
+      return res.status(200).json({
+        active: false
+      });
+    }
+
+    return res.status(200).json({
+      active: true,
+      user_id: sesion.user_id,
+      username: sesion.username,
+      roles: sesion.roles
+    });
+  }
+);
+
+app.post(
+  "/logout",
+  verificarGateway,
+  (req, res) => {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({
+        error: "Token requerido"
+      });
+    }
+
+    sesiones.delete(token);
+
+    return res.status(200).json({
+      message:
+        "SesiÃ³n cerrada correctamente"
+    });
+  }
+);
+
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    service: "out-service"
+  });
+});
+
+app.listen(PORT, () => {
+  console.log(
+    `[out-service] Escuchando en http://localhost:${PORT}`
+  );
+});
+
+========== api-productos-graphql\services\vault.js ==========
+import "dotenv/config";
+
+const VAULT_ADDR =
+  process.env.VAULT_ADDR ||
+  "http://127.0.0.1:8200";
+
+const VAULT_TOKEN =
+  process.env.VAULT_TOKEN;
+
+if (!VAULT_TOKEN) {
+  throw new Error(
+    "Falta la variable VAULT_TOKEN"
+  );
+}
+
+export async function cargarSecretosVault() {
+  const respuesta = await fetch(
+    `${VAULT_ADDR}/v1/secret/data/gateway`,
+    {
+      headers: {
+        "X-Vault-Token": VAULT_TOKEN
+      }
+    }
+  );
+
+  if (!respuesta.ok) {
+    throw new Error(
+      `No se pudieron obtener los secretos de Vault: ${respuesta.status}`
+    );
+  }
+
+  const resultado =
+    await respuesta.json();
+
+  const secretos =
+    resultado?.data?.data;
+
+  if (
+    !secretos?.backend_shared_secret ||
+    !secretos?.gateway_out_secret
+  ) {
+    throw new Error(
+      "Vault no contiene los secretos requeridos"
+    );
+  }
+
+  return {
+    backendSharedSecret:
+      secretos.backend_shared_secret,
+
+    gatewayOutSecret:
+      secretos.gateway_out_secret
+  };
+}
+
+========== api-productos-graphql\middleware\auth.js ==========
+import 'dotenv/config';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'clave-secreta-dev';
+
+export function generarTokens(payload) {
+  const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '15m' });
+  const refreshToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+  return { accessToken, refreshToken };
+}
+
+export function verificarToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // formato: "Bearer <token>"
+
+  if (!token) {
+    return res.status(401).json({ error: 'Token no proporcionado' });
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(403).json({ error: 'Token invÃ¡lido o expirado' });
+    }
+    req.usuario = decoded;
+    next();
+  });
+}
+
+========== api-productos-graphql\middleware\identity.js ==========
+export function cargarIdentidad(req, res, next) {
+  const username =
+    req.get("X-Authenticated-User");
+
+  const rolesHeader =
+    req.get("X-Authenticated-Roles");
+
+  if (!username || !rolesHeader) {
+    return res.status(403).json({
+      error: "Identidad autenticada ausente"
+    });
+  }
+
+  const roles = rolesHeader
+    .split(",")
+    .map(rol => rol.trim())
+    .filter(Boolean);
+
+  req.auth = {
+    username,
+    roles
+  };
+
+  console.log(
+    `[backend] ${req.method} ${req.originalUrl} usuario=${username} roles=${roles.join(",")}`
+  );
+
+  next();
+}
+
+export function requerirRol(rolRequerido) {
+  return (req, res, next) => {
+    if (
+      !req.auth?.roles?.includes(rolRequerido)
+    ) {
+      return res.status(403).json({
+        error: `OperaciÃ³n restringida al rol ${rolRequerido}`
+      });
+    }
+
+    next();
+  };
+}
+
+========== api-productos-graphql\routes\productos.gateway.routes.js ==========
+import "dotenv/config";
+import { Router } from "express";
+
+import {
+  cargarSecretosVault
+} from "../services/vault.js";
+
+const router = Router();
+
+const BACKEND_URL =
+  process.env.BACKEND_PRODUCTOS_URL ||
+  "http://localhost:5000";
+
+const OUT_SERVICE_URL =
+  process.env.OUT_SERVICE_URL ||
+  "http://localhost:8100";
+
+const {
+  backendSharedSecret,
+  gatewayOutSecret
+} = await cargarSecretosVault();
+
+async function introspectarToken(
+  req,
+  res,
+  next
+) {
+  const authorization =
+    req.get("Authorization");
+
+  if (
+    !authorization ||
+    !authorization.startsWith("Bearer ")
+  ) {
+    return res.status(401).json({
+      error:
+        "Token de autorizaciÃ³n requerido"
+    });
+  }
+
+  const token =
+    authorization
+      .substring(7)
+      .trim();
+
+  try {
+    const respuesta = await fetch(
+      `${OUT_SERVICE_URL}/introspect`,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json",
+
+          "X-Gateway-Out-Secret":
+            gatewayOutSecret
+        },
+
+        body: JSON.stringify({
+          token
+        })
+      }
+    );
+
+    if (!respuesta.ok) {
+      return res.status(502).json({
+        error:
+          "Error al consultar el servicio de autenticaciÃ³n"
+      });
+    }
+
+    const data =
+      await respuesta.json();
+
+    if (!data.active) {
+      return res.status(401).json({
+        error:
+          "Token invÃ¡lido o expirado"
+      });
+    }
+
+    if (!data.username) {
+      return res.status(502).json({
+        error:
+          "Respuesta invÃ¡lida del servicio de autenticaciÃ³n"
+      });
+    }
+
+    req.identidad = {
+      user_id: data.user_id,
+      username: data.username,
+      roles:
+        Array.isArray(data.roles)
+          ? data.roles
+          : []
+    };
+
+    next();
+
+  } catch (error) {
+    console.error(
+      "[gateway] IntrospecciÃ³n fallida:",
+      error.message
+    );
+
+    return res.status(503).json({
+      error:
+        "Servicio de autenticaciÃ³n no disponible"
+    });
+  }
+}
+
+router.use(introspectarToken);
+
+async function reenviar(
+  req,
+  res,
+  path
+) {
+  try {
+    const opciones = {
+      method: req.method,
+
+      headers: {
+        "Content-Type":
+          "application/json",
+
+        "X-Gateway-Secret":
+          backendSharedSecret,
+
+        "X-Authenticated-User":
+          req.identidad.username,
+
+        "X-Authenticated-Roles":
+          req.identidad.roles.join(",")
+      }
+    };
+
+    if (
+      ["POST", "PUT"].includes(
+        req.method
+      )
+    ) {
+      opciones.body =
+        JSON.stringify(req.body);
+    }
+
+    const respuesta = await fetch(
+      `${BACKEND_URL}${path}`,
+      opciones
+    );
+
+    if (respuesta.status === 204) {
+      return res.status(204).send();
+    }
+
+    const data =
+      await respuesta.json();
+
+    return res
+      .status(respuesta.status)
+      .json(data);
+
+  } catch (error) {
+    console.error(
+      "[gateway] Backend no disponible:",
+      error.message
+    );
+
+    return res.status(502).json({
+      error: "Backend no disponible"
+    });
+  }
+}
+
+router.get("/", (req, res) => {
+  const query =
+    new URLSearchParams(
+      req.query
+    ).toString();
+
+  reenviar(
+    req,
+    res,
+    `/productos${query ? `?${query}` : ""}`
+  );
+});
+
+router.get("/:id", (req, res) => {
+  reenviar(
+    req,
+    res,
+    `/productos/${req.params.id}`
+  );
+});
+
+router.post("/", (req, res) => {
+  reenviar(
+    req,
+    res,
+    "/productos"
+  );
+});
+
+router.put("/:id", (req, res) => {
+  reenviar(
+    req,
+    res,
+    `/productos/${req.params.id}`
+  );
+});
+
+router.delete("/:id", (req, res) => {
+  reenviar(
+    req,
+    res,
+    `/productos/${req.params.id}`
+  );
+});
+
+export default router;
+
+========== api-productos-graphql\routes\productos.routes.js ==========
+import { Router } from 'express';
+import {
+  listarProductos,
+  obtenerProducto,
+  crearProducto,
+  actualizarProducto,
+  eliminarProducto
+} from '../controllers/productos.controller.js';
+
+import {
+  requerirRol
+} from '../middleware/identity.js';
+
+const router = Router();
+
+// Lecturas: permitidas para usuarios autenticados
+router.get('/', listarProductos);
+router.get('/:id', obtenerProducto);
+
+// Modificaciones: solo administradores
+router.post(
+  '/',
+  requerirRol('admin'),
+  crearProducto
+);
+
+router.put(
+  '/:id',
+  requerirRol('admin'),
+  actualizarProducto
+);
+
+router.delete(
+  '/:id',
+  requerirRol('admin'),
+  eliminarProducto
+);
+
+export default router;
+
+========== api-productos-graphql\routes\auth.gateway.routes.js ==========
+import "dotenv/config";
+import { Router } from "express";
+
+import {
+  cargarSecretosVault
+} from "../services/vault.js";
+
+const router = Router();
+
+const OUT_SERVICE_URL =
+  process.env.OUT_SERVICE_URL ||
+  "http://localhost:8100";
+
+const {
+  gatewayOutSecret
+} = await cargarSecretosVault();
+
+router.post("/login", async (req, res) => {
+  try {
+    const username =
+      req.body.username ??
+      req.body.usuario;
+
+    const password =
+      req.body.password ??
+      req.body.clave;
+
+    const respuesta = await fetch(
+      `${OUT_SERVICE_URL}/login`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+        body: JSON.stringify({
+          username,
+          password
+        })
+      }
+    );
+
+    const data =
+      await respuesta.json();
+
+    // Compatibilidad con el frontend anterior
+    if (data.access_token) {
+      data.accessToken =
+        data.access_token;
+    }
+
+    return res
+      .status(respuesta.status)
+      .json(data);
+
+  } catch (error) {
+    console.error(
+      "[gateway] out-service no disponible:",
+      error.message
+    );
+
+    return res.status(503).json({
+      error:
+        "Servicio de autenticaciÃ³n no disponible"
+    });
+  }
+});
+
+router.post("/logout", async (req, res) => {
+  const authorization =
+    req.get("Authorization");
+
+  if (
+    !authorization ||
+    !authorization.startsWith("Bearer ")
+  ) {
+    return res.status(401).json({
+      error: "Token requerido"
+    });
+  }
+
+  const token =
+    authorization
+      .substring(7)
+      .trim();
+
+  try {
+    const respuesta = await fetch(
+      `${OUT_SERVICE_URL}/logout`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+
+          "X-Gateway-Out-Secret":
+            gatewayOutSecret
+        },
+        body: JSON.stringify({
+          token
+        })
+      }
+    );
+
+    const data =
+      await respuesta.json();
+
+    return res
+      .status(respuesta.status)
+      .json(data);
+
+  } catch (error) {
+    return res.status(503).json({
+      error:
+        "Servicio de autenticaciÃ³n no disponible"
+    });
+  }
+});
+
+export default router;
+
+========== api-productos-graphql\routes\auth.routes.js ==========
+import { Router } from 'express';
+import { generarTokens } from '../middleware/auth.js';
+
+const router = Router();
+
+router.post('/login', (req, res) => {
+  const { usuario, clave } = req.body;
+  router.post('/login', (req, res) => {
+  const { usuario, clave } = req.body;
+
+  if (usuario !== 'admin' || clave !== '1234') {
+    return res.status(401).json({ error: 'Credenciales invÃ¡lidas' });
+  }
+
+  const tokens = generarTokens({ usuario });
+  res.status(200).json(tokens);
+});
+  if (usuario !== 'admin' || clave !== '1234') {
+    return res.status(401).json({ error: 'Credenciales invÃ¡lidas' });
+  }
+
+  const tokens = generarTokens({ usuario });
+  res.status(200).json(tokens);
+});
+
+export default router;
